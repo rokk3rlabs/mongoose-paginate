@@ -1,4 +1,5 @@
 'use strict';
+var Promise = require('bluebird');
 
 /**
  * @package mongoose-paginate
@@ -23,8 +24,12 @@ function paginate(query, options, callback) {
   let sort = options.sort;
   let populate = options.populate;
   let lean = options.lean || false;
-  let leanWithId = options.leanWithId ? options.leanWithId : true;
+  let leanWithId = typeof options.leanWithId == 'undefined' ? true : options.leanWithId;
+
+  
   let limit = options.limit ? options.limit : 10;
+
+
   let page, offset, skip, promises;
   if (options.offset) {
     offset = options.offset;
@@ -42,17 +47,32 @@ function paginate(query, options, callback) {
       .select(select)
       .sort(sort)
       .skip(skip)
-      .limit(limit)
       .lean(lean);
+
+    if(options.limit !== 0){
+      docsQuery.limit(limit)
+    }
+
     if (populate) {
       [].concat(populate).forEach((item) => {
         docsQuery.populate(item);
       });
     }
     promises = {
-      docs: docsQuery.exec(),
-      count: this.count(query).exec()
+      count: this.count(query).exec(),
     };
+
+    if(options.limit === 0){
+      
+      promises.docs = new Promise((resolve, reject) => {
+        resolve([]);  
+      });
+
+    }else{
+      promises.docs = docsQuery.exec()      
+    }
+
+
     if (lean && leanWithId) {
       promises.docs = promises.docs.then((docs) => {
         docs.forEach((doc) => {
@@ -62,29 +82,36 @@ function paginate(query, options, callback) {
       });
     }
   }
-  promises = Object.keys(promises).map((x) => promises[x]);
-  return Promise.all(promises).then((data) => {
+  
+  return Promise.props(promises).then((data) => {
+    
     let result = {
       data: data.docs,
-      paginate:{
+      paging:{
         totalItems: data.count,
-        itemsPerPage: limit  
+        itemsPerPage : options.limit === 0 ? options.limit : limit
       }
       
     };
+
+    
+
     if (offset !== undefined) {
-      result.paginate.currentStartIndex = offset;
+      result.paging.currentStartIndex = offset;
     }
     if (page !== undefined) {
-      result.paginate.currentPage = page;
-      result.paginate.totalPages = Math.ceil(data.count / limit) || 1;
+      result.paging.currentPage = page;
+      result.paging.totalPages = Math.ceil(data.count / (options.limit === 0 ? options.limit : limit)) || 1;
     }
     if (typeof callback === 'function') {
       return callback(null, result);
     }
-    let promise = new Promise();
-    promise.resolve(result);
-    return promise;
+
+    
+    return new Promise((resolve, reject) => {
+      resolve(result);  
+    });
+    
   });
 }
 

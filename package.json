@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/edwardhotchkiss/mongoose-paginate.git"
+    "url": "https://github.com/rokk3rlabs/mongoose-paginate.git"
   },
   "license": "MIT",
   "keywords": [
@@ -35,7 +35,9 @@
   "engines": {
     "node": ">=4.2.4"
   },
-  "dependencies": {},
+  "dependencies": {
+    "bluebird": "^3.4.0"
+  },
   "devDependencies": {
     "mongoose": "4.3.4",
     "mocha": "2.3.4",
