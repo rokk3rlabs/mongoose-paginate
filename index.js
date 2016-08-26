@@ -89,7 +89,7 @@ function paginate(query, options, callback) {
       data: data.docs,
       paging:{
         totalItems: data.count,
-        itemsPerPage : options.limit === 0 ? options.limit : limit
+        limit : options.limit === 0 ? options.limit : limit
       }
       
     };
@@ -100,7 +100,7 @@ function paginate(query, options, callback) {
       result.paging.currentStartIndex = offset;
     }
     if (page !== undefined) {
-      result.paging.currentPage = page;
+      result.paging.page = page;
       result.paging.totalPages = Math.ceil(data.count / (options.limit === 0 ? options.limit : limit)) || 1;
     }
     if (typeof callback === 'function') {

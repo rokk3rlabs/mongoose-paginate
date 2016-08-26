@@ -80,8 +80,8 @@ describe('mongoose-paginate', function() {
         expect(result.paging).to.be.an.instanceOf(Object);
         expect(result.data[0]).to.be.an.instanceof(mongoose.Document);
         expect(result.paging.totalItems).to.equal(100);
-        expect(result.paging.itemsPerPage).to.equal(10);
-        expect(result.paging.currentPage).to.equal(1);
+        expect(result.paging.limit).to.equal(10);
+        expect(result.paging.page).to.equal(1);
         expect(result.paging.totalPages).to.equal(10);
         expect(result.paging.currentStartIndex).to.equal(0);
       });
@@ -93,7 +93,7 @@ describe('mongoose-paginate', function() {
       };
       return Book.paginate().then(function(result) {
         expect(result.data).to.have.length(20);
-        expect(result.paging.itemsPerPage).to.equal(20);
+        expect(result.paging.limit).to.equal(20);
         expect(result.data[0]).to.not.be.an.instanceof(mongoose.Document);
       });
     });
@@ -101,9 +101,9 @@ describe('mongoose-paginate', function() {
       return Book.paginate({}, { offset: 30, limit: 20 }).then(function(result) {
         expect(result.data).to.have.length(20);
         expect(result.paging.totalItems).to.equal(100);
-        expect(result.paging.itemsPerPage).to.equal(20);
+        expect(result.paging.limit).to.equal(20);
         expect(result.paging.currentStartIndex).to.equal(30);
-        expect(result).to.not.have.property('currentPage');
+        expect(result).to.not.have.property('page');
         expect(result).to.not.have.property('totalPages');
       });
     });
@@ -111,8 +111,8 @@ describe('mongoose-paginate', function() {
       return Book.paginate({}, { page: 1, limit: 20 }).then(function(result) {
         expect(result.data).to.have.length(20);
         expect(result.paging.totalItems).to.equal(100);
-        expect(result.paging.itemsPerPage).to.equal(20);
-        expect(result.paging.currentPage).to.equal(1);
+        expect(result.paging.limit).to.equal(20);
+        expect(result.paging.page).to.equal(1);
         expect(result.paging.totalPages).to.equal(5);
         expect(result.paging).to.not.have.property('currentStartIndex');
       });
@@ -122,8 +122,8 @@ describe('mongoose-paginate', function() {
         
         expect(result.data).to.have.length(0);
         expect(result.paging.totalItems).to.equal(100);
-        expect(result.paging.itemsPerPage).to.equal(0);
-        expect(result.paging.currentPage).to.equal(1);
+        expect(result.paging.limit).to.equal(0);
+        expect(result.paging.page).to.equal(1);
         expect(result.paging.totalPages).to.equal(Infinity);
       });
     });
